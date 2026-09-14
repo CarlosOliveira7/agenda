@@ -7,6 +7,18 @@
   <meta name="description" content="Painel de entregas e prazos de trabalhos acadêmicos da UniBalsas.">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
 
+  <!-- Script inline para aplicar o tema antes do render evitando flash visual -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('agendaub_theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/components.css">
@@ -27,13 +39,33 @@
       </div>
 
       <div class="header-actions">
-        <!-- Indicador Discreto de Conexão com Firebase -->
+        <!-- Indicador de Status da Nuvem -->
         <div class="sync-status-indicator" id="syncIndicator" title="Conexão com Firebase">
           <span class="sync-dot offline" id="syncDot"></span>
           <span id="syncText">Conectando...</span>
         </div>
 
-        <!-- Botão Adicionar -->
+        <!-- Botão Alternador Dark Mode / Light Mode -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+          <!-- Ícone Lua (Modo Claro) -->
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <!-- Ícone Sol (Modo Escuro) -->
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Botão Nova Entrega -->
         <button class="btn btn-primary" id="openAddModalBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -90,7 +122,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="search-input" id="searchInput" placeholder="Buscar por trabalho ou responsável...">
+          <input type="text" class="search-input" id="searchInput" placeholder="Buscar entrega ou responsável... (/ para focar)">
         </div>
       </div>
 
@@ -126,6 +158,13 @@
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
           Restaurar
+        </button>
+        <button class="card-action-btn" id="clearDbBtn" title="Limpar todas as entregas cadastradas">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Limpar Painel
         </button>
         <input type="file" id="importFileInput" accept=".json" style="display: none;">
       </div>
@@ -179,7 +218,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" data-close-modal="addModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Entrega</button>
         </div>
       </form>
     </div>

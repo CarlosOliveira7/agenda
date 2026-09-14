@@ -2,6 +2,7 @@
  * ==========================================================================
  * APP CONTROLLER
  * Orquestração do estado, sincronização direta com Firebase e eventos da UI.
+ * Banco de dados limpo (sem itens fictícios).
  * ==========================================================================
  */
 (function () {
@@ -15,61 +16,6 @@
     permissionDenied: false,
     pendingDeleteId: null
   };
-
-  // Exemplos acadêmicos realistas da UniBalsas para primeiro acesso
-  function getSampleItems() {
-    const today = new Date();
-
-    const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - 2);
-
-    const urgentDate = new Date(today);
-    urgentDate.setDate(today.getDate() + 1);
-
-    const todayDate = new Date(today);
-
-    const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + 5);
-
-    return [
-      {
-        id: 'item-1',
-        title: 'Artigo de Metodologia Científica - Normas ABNT',
-        link: 'https://docs.google.com',
-        assignee: 'Lara Beatriz',
-        dueDate: window.DateUtils.formatDateForInput(pastDate),
-        completed: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'item-2',
-        title: 'Estudo de Caso - Gestão e Processos',
-        link: 'https://drive.google.com',
-        assignee: 'Carlos Oliveira',
-        dueDate: window.DateUtils.formatDateForInput(todayDate),
-        completed: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'item-3',
-        title: 'Slides da Apresentação do Projeto',
-        link: 'https://docs.google.com/presentation',
-        assignee: 'Mariana Souza',
-        dueDate: window.DateUtils.formatDateForInput(urgentDate),
-        completed: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'item-4',
-        title: 'Relatório Final de Atividades Acadêmicas',
-        link: 'https://docs.google.com',
-        assignee: 'Lucas Ferreira',
-        dueDate: window.DateUtils.formatDateForInput(futureDate),
-        completed: false,
-        createdAt: new Date().toISOString()
-      }
-    ];
-  }
 
   function renderApp() {
     window.UIEngine.renderFiltersAndCounts(state.items, state.currentFilter);
@@ -98,7 +44,19 @@
   }
 
   function setupEventListeners() {
-    // Fechamento de modais
+    // 1. Alternador de Modo Claro / Modo Escuro (Dark Mode)
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('agendaub_theme', next);
+        window.UIEngine.showToast(next === 'dark' ? 'Modo escuro ativado' : 'Modo claro ativado');
+      });
+    }
+
+    // 2. Fechamento de modais
     document.addEventListener('click', function (e) {
       if (e.target.classList.contains('modal-backdrop')) {
         window.UIEngine.closeModal(e.target.id);
@@ -116,9 +74,15 @@
           window.UIEngine.closeModal(modal.id);
         });
       }
+      // Atalho "/" para pesquisar
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        const search = document.getElementById('searchInput');
+        if (search) search.focus();
+      }
     });
 
-    // Formulário de Nova Entrega
+    // 3. Formulário de Nova Entrega
     const addForm = document.getElementById('addForm');
     if (addForm) {
       addForm.addEventListener('submit', async function (e) {
@@ -135,7 +99,7 @@
         const dueDate = dueDateInput.value;
 
         if (!title || !link || !assignee || !dueDate) {
-          alert('Por favor, preencha todos os campos.');
+          alert('Por favor, preencha todos os campos obrigatórios.');
           return;
         }
 
@@ -158,11 +122,11 @@
 
         addForm.reset();
         window.UIEngine.closeModal('addModal');
-        window.UIEngine.showToast('Entrega adicionada com sucesso');
+        window.UIEngine.showToast('Entrega adicionada');
       });
     }
 
-    // Atalhos rápidos de data
+    // 4. Atalhos rápidos de data
     document.querySelectorAll('.date-shortcut-chip').forEach(chip => {
       chip.addEventListener('click', function () {
         const days = parseInt(this.getAttribute('data-days'), 10);
@@ -175,7 +139,7 @@
       });
     });
 
-    // Ações dos cartões (Concluir / Copiar / Excluir)
+    // 5. Ações dos cartões
     const cardsGrid = document.getElementById('cardsGrid');
     if (cardsGrid) {
       cardsGrid.addEventListener('click', async function (e) {
@@ -220,7 +184,7 @@
       });
     }
 
-    // Confirmação de exclusão
+    // 6. Confirmação de exclusão
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
       confirmDeleteBtn.addEventListener('click', async function () {
@@ -234,7 +198,7 @@
       });
     }
 
-    // Filtros por status
+    // 7. Filtros por status
     const filtersGroup = document.getElementById('filtersGroup');
     if (filtersGroup) {
       filtersGroup.addEventListener('click', function (e) {
@@ -246,7 +210,7 @@
       });
     }
 
-    // Busca
+    // 8. Busca
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
       searchInput.addEventListener('input', function (e) {
@@ -255,7 +219,7 @@
       });
     }
 
-    // Botão Adicionar do Header
+    // 9. Botão Adicionar do Header
     const openAddModalBtn = document.getElementById('openAddModalBtn');
     if (openAddModalBtn) {
       openAddModalBtn.addEventListener('click', () => {
@@ -269,7 +233,23 @@
       });
     }
 
-    // Exportar / Importar JSON (Backup)
+    // 10. Limpar Banco de Dados (Ação Administrativa / Limpeza)
+    const clearDbBtn = document.getElementById('clearDbBtn');
+    if (clearDbBtn) {
+      clearDbBtn.addEventListener('click', async function () {
+        if (state.items.length === 0) {
+          window.UIEngine.showToast('O banco de dados já está vazio.');
+          return;
+        }
+        if (confirm('Tem certeza de que deseja limpar todas as entregas do painel? Esta ação não pode ser desfeita.')) {
+          state.items = [];
+          await persistData();
+          window.UIEngine.showToast('Banco de dados limpo com sucesso.');
+        }
+      });
+    }
+
+    // 11. Exportar / Importar JSON
     const exportDataBtn = document.getElementById('exportDataBtn');
     if (exportDataBtn) {
       exportDataBtn.addEventListener('click', function () {
@@ -306,7 +286,7 @@
               alert('Arquivo inválido.');
             }
           } catch (err) {
-            alert('Erro ao ler JSON: ' + err.message);
+            alert('Erro ao processar JSON: ' + err.message);
           }
           importFileInput.value = '';
         };
@@ -314,18 +294,24 @@
       });
     }
 
-    // Sincronização entre abas
+    // 12. Sincronização entre abas
     window.SyncEngine.onBroadcastMessage(function (items) {
       state.items = items;
       renderApp();
     });
   }
 
-  // Inicialização
+  // Inicialização Limpa
   async function init() {
     setupEventListeners();
 
-    // 1. Tenta carregar do Firebase diretamente
+    // Remove qualquer item de exemplo anterior do cache local
+    const cached = window.SyncEngine.loadLocalItems();
+    if (cached && Array.isArray(cached) && cached.some(i => i.id && (i.id.startsWith('sample-') || i.id.startsWith('item-')))) {
+      window.SyncEngine.saveLocalItems([], false);
+    }
+
+    // Tenta conectar à nuvem
     const cloudData = await window.SyncEngine.syncWithCloud('FETCH');
 
     if (cloudData && cloudData.error === 'PERMISSION_DENIED') {
@@ -333,28 +319,21 @@
       state.isOnline = false;
       window.UIEngine.updateSyncUI(false, true);
 
-      // Carrega localmente para que o usuário consiga usar imediatamente
+      // Inicia com lista limpa ou cache local real
       const local = window.SyncEngine.loadLocalItems();
-      state.items = local !== null ? local : getSampleItems();
+      state.items = Array.isArray(local) ? local : [];
     } else if (Array.isArray(cloudData)) {
       state.permissionDenied = false;
       state.isOnline = true;
       window.UIEngine.updateSyncUI(true, false);
 
-      if (cloudData.length > 0) {
-        state.items = cloudData;
-        window.SyncEngine.saveLocalItems(state.items, false);
-      } else {
-        // Nuvem vazia: usa cache ou semente e envia para a nuvem
-        const local = window.SyncEngine.loadLocalItems();
-        state.items = local !== null && local.length > 0 ? local : getSampleItems();
-        window.SyncEngine.syncWithCloud('SAVE', state.items);
-      }
+      state.items = cloudData;
+      window.SyncEngine.saveLocalItems(state.items, false);
 
-      // Inicia escuta em tempo real (Server-Sent Events)
+      // Ouvinte SSE em tempo real
       window.SyncEngine.startRealtimeSync(
         (newItems) => {
-          state.items = newItems;
+          state.items = Array.isArray(newItems) ? newItems : [];
           window.SyncEngine.saveLocalItems(state.items, false);
           renderApp();
         },
@@ -364,9 +343,8 @@
         }
       );
     } else {
-      // Falha temporária de rede: fallback local
       const local = window.SyncEngine.loadLocalItems();
-      state.items = local !== null ? local : getSampleItems();
+      state.items = Array.isArray(local) ? local : [];
       window.UIEngine.updateSyncUI(false, false);
     }
 
