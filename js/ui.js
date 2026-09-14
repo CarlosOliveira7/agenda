@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
- * UI RENDERING & COMPONENT ENGINE
- * Gerencia a renderização de filtros, cartões, modais e alertas toast.
+ * UI RENDERING ENGINE
+ * Renderização de componentes, cartões, modais e feedback da interface.
  * ==========================================================================
  */
 (function (root, factory) {
@@ -30,7 +30,7 @@
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
       <span>${escapeHtml(message)}</span>
@@ -40,8 +40,8 @@
     setTimeout(() => toast.classList.add('show'), 10);
     setTimeout(() => {
       toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 250);
-    }, 3000);
+      setTimeout(() => toast.remove(), 200);
+    }, 2800);
   }
 
   function openModal(modalId) {
@@ -65,28 +65,25 @@
     }
   }
 
-  function updateSyncUI(isOnline, firebaseUrl) {
+  function updateSyncUI(status, permissionDenied = false) {
     const dot = document.getElementById('syncDot');
     const text = document.getElementById('syncText');
-    const banner = document.getElementById('syncBanner');
+    const wrapper = document.getElementById('syncIndicator');
 
     if (!dot || !text) return;
 
-    if (firebaseUrl) {
-      if (isOnline) {
-        dot.className = 'sync-indicator-dot online';
-        text.textContent = 'Nuvem Conectada';
-        if (banner) banner.classList.add('hidden');
-      } else {
-        dot.className = 'sync-indicator-dot local';
-        text.textContent = 'Conectando à Nuvem...';
-      }
+    if (permissionDenied) {
+      dot.className = 'sync-dot offline';
+      text.textContent = 'Ajustar regras do Firebase';
+      if (wrapper) wrapper.title = 'As regras do Firebase estão bloqueadas (.read: false). Libere a leitura/escrita no console do Firebase para sincronizar entre todos os membros.';
+    } else if (status) {
+      dot.className = 'sync-dot online';
+      text.textContent = 'Sincronizado';
+      if (wrapper) wrapper.title = 'Conectado em tempo real ao Firebase Realtime Database.';
     } else {
-      dot.className = 'sync-indicator-dot local';
+      dot.className = 'sync-dot offline';
       text.textContent = 'Modo Local';
-      if (banner && !sessionStorage.getItem('sync_banner_closed')) {
-        banner.classList.remove('hidden');
-      }
+      if (wrapper) wrapper.title = 'Operando com cache local enquanto conecta à nuvem.';
     }
   }
 
@@ -136,7 +133,6 @@
 
     grid.innerHTML = '';
 
-    // Filtragem
     let filtered = items.filter(item => {
       const status = window.DateUtils.getItemStatus(item);
       if (currentFilter !== 'todos' && status !== currentFilter) {
@@ -151,10 +147,8 @@
       return true;
     });
 
-    // Ordenação
     filtered = window.DateUtils.sortItems(filtered);
 
-    // Vazio
     if (filtered.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
@@ -162,21 +156,17 @@
         <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
-        <h3 class="empty-state-title">Nenhum trabalho encontrado</h3>
+        <h3 class="empty-state-title">Nenhuma entrega encontrada</h3>
         <p class="empty-state-desc">
           ${searchQuery 
-            ? 'Nenhum resultado corresponde à sua pesquisa. Tente usar outros termos.' 
+            ? 'Nenhum resultado corresponde à sua pesquisa.' 
             : currentFilter !== 'todos'
-              ? `Não há entregas com o status "${window.DateUtils.getStatusLabel(currentFilter)}" no momento.`
-              : 'Seu painel ainda não possui trabalhos cadastrados. Clique no botão abaixo para começar!'}
+              ? `Não há trabalhos com status "${window.DateUtils.getStatusLabel(currentFilter)}" no momento.`
+              : 'Nenhum trabalho adicionado ao painel ainda.'}
         </p>
         ${!searchQuery && currentFilter === 'todos' ? `
           <button class="btn btn-primary" id="emptyAddBtn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Adicionar Primeiro Trabalho
+            Adicionar Entrega
           </button>
         ` : ''}
       `;
@@ -189,7 +179,6 @@
       return;
     }
 
-    // Renderização dos cartões
     filtered.forEach(item => {
       const status = window.DateUtils.getItemStatus(item);
       const domain = window.DateUtils.extractDomain(item.link);
@@ -209,10 +198,6 @@
               <span>${window.DateUtils.getStatusLabel(status)}</span>
             </span>
             <span class="link-host-pill" title="${escapeHtml(item.link)}">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
               ${escapeHtml(domain)}
             </span>
           </div>
@@ -221,7 +206,7 @@
              target="_blank" 
              rel="noopener noreferrer" 
              class="card-title-link"
-             title="Abrir ${escapeHtml(item.title)} em nova aba">
+             title="Abrir ${escapeHtml(item.title)}">
             <span>${escapeHtml(item.title)}</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -231,12 +216,12 @@
           </a>
 
           <div class="card-details">
-            <div class="detail-item" title="Responsável pelo trabalho">
+            <div class="detail-item" title="Responsável">
               <div class="assignee-avatar">${escapeHtml(initials)}</div>
               <span class="assignee-name">${escapeHtml(item.assignee)}</span>
             </div>
 
-            <div class="detail-item" title="Prazo de entrega">
+            <div class="detail-item" title="Prazo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -252,8 +237,7 @@
         <div class="card-footer">
           <button class="card-action-btn ${item.completed ? 'btn-reopen' : 'btn-toggle-done'}" 
                   data-action="toggle" 
-                  data-id="${item.id}"
-                  title="${item.completed ? 'Reabrir trabalho' : 'Marcar trabalho como concluído'}">
+                  data-id="${item.id}">
             ${item.completed ? `
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="1 4 1 10 7 10"></polyline>
@@ -272,7 +256,7 @@
             <button class="card-action-btn" 
                     data-action="copy-link" 
                     data-link="${escapeHtml(item.link)}"
-                    title="Copiar link do trabalho">
+                    title="Copiar link">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -283,7 +267,7 @@
                     data-action="delete" 
                     data-id="${item.id}"
                     data-title="${escapeHtml(item.title)}"
-                    title="Excluir trabalho">
+                    title="Excluir">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

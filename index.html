@@ -4,49 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel de Entregas - UniBalsas</title>
-  <meta name="description" content="Painel de entregas para grupos de trabalho gerenciarem links e prazos em tempo real com a identidade visual UniBalsas.">
+  <meta name="description" content="Painel de entregas e prazos de trabalhos acadêmicos da UniBalsas.">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
 
-  <!-- Estilos Modulares (Separados por responsabilidade) -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/components.css">
 </head>
 <body>
 
-  <!-- Faixa Institucional Superior -->
-  <div class="top-brand-stripe" aria-hidden="true"></div>
-
   <!-- ==========================================================================
        CABEÇALHO
        ========================================================================== -->
   <header class="header">
     <div class="container header-content">
-      <div class="logo-area">
-        <div class="logo-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
-        </div>
-        <div>
-          <h1 class="brand-title">
-            Painel de Entregas
-            <span class="brand-badge">UniBalsas</span>
-          </h1>
-          <p class="brand-subtitle">Gestão de trabalhos, prazos e links compartilhados</p>
+      <div class="brand-wrapper">
+        <div class="brand-logo-mark" aria-hidden="true">UB</div>
+        <div class="brand-titles">
+          <h1 class="brand-title">Painel de Entregas</h1>
+          <span class="brand-institution">UniBalsas Centro Universitário</span>
         </div>
       </div>
 
       <div class="header-actions">
-        <!-- Indicador de Sincronização -->
-        <button class="sync-status-btn" id="syncStatusBtn" title="Configurar sincronização em nuvem compartilhada">
-          <span class="sync-indicator-dot local" id="syncDot"></span>
-          <span id="syncText">Modo Local</span>
-        </button>
+        <!-- Indicador Discreto de Conexão com Firebase -->
+        <div class="sync-status-indicator" id="syncIndicator" title="Conexão com Firebase">
+          <span class="sync-dot offline" id="syncDot"></span>
+          <span id="syncText">Conectando...</span>
+        </div>
 
         <!-- Botão Adicionar -->
         <button class="btn btn-primary" id="openAddModalBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
@@ -57,32 +46,12 @@
   </header>
 
   <!-- ==========================================================================
-       BANNER DE ATIVAÇÃO DE COMPARTILHAMENTO (GITHUB PAGES COMPATIBLE)
-       ========================================================================== -->
-  <div class="sync-banner" id="syncBanner">
-    <div class="container sync-banner-content">
-      <div class="sync-banner-text">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        <span id="syncBannerMsg">Para que todo o grupo acesse e sincronize as mesmas entregas em tempo real no GitHub Pages, conecte uma base em nuvem gratuita.</span>
-      </div>
-      <div class="sync-banner-actions">
-        <button class="banner-link-btn" id="bannerConfigBtn">Conectar Nuvem</button>
-        <button class="banner-close-btn" id="bannerCloseBtn" title="Ocultar aviso">&times;</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
-       CORPO PRINCIPAL
+       CONTEÚDO PRINCIPAL
        ========================================================================== -->
   <main class="main-section">
     <div class="container">
       
-      <!-- Barra de Ferramentas: Filtros por Status e Busca -->
+      <!-- Barra de Filtros e Busca -->
       <div class="toolbar">
         <div class="filters-group" id="filtersGroup" role="tablist">
           <button class="filter-btn active" data-filter="todos" role="tab" aria-selected="true">
@@ -115,13 +84,13 @@
           </button>
         </div>
 
-        <!-- Campo de Busca Instantânea -->
+        <!-- Campo de Busca -->
         <div class="search-box">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="search-input" id="searchInput" placeholder="Buscar por título ou responsável...">
+          <input type="text" class="search-input" id="searchInput" placeholder="Buscar por trabalho ou responsável...">
         </div>
       </div>
 
@@ -139,24 +108,24 @@
   <footer class="footer">
     <div class="container footer-content">
       <div>
-        <strong>Painel de Entregas</strong> &bull; UniBalsas Centro Universitário &bull; Gestão ágil de prazos.
+        <strong>Painel de Entregas</strong> &bull; UniBalsas Centro Universitário
       </div>
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <button class="card-action-btn" id="exportDataBtn" title="Baixar cópia de segurança em JSON">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button class="card-action-btn" id="exportDataBtn" title="Baixar backup em JSON">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          Exportar Backup
+          Backup
         </button>
         <button class="card-action-btn" id="importDataBtn" title="Restaurar de arquivo JSON">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          Restaurar JSON
+          Restaurar
         </button>
         <input type="file" id="importFileInput" accept=".json" style="display: none;">
       </div>
@@ -167,17 +136,11 @@
        MODAIS
        ========================================================================== -->
 
-  <!-- Modal 1: Adicionar Entrega -->
+  <!-- Modal: Nova Entrega -->
   <div class="modal-backdrop" id="addModal">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
       <div class="modal-header">
-        <h3 class="modal-title" id="addModalTitle">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          Novo Trabalho
-        </h3>
+        <h3 class="modal-title" id="addModalTitle">Nova Entrega</h3>
         <button class="modal-close-btn" data-close-modal="addModal" aria-label="Fechar">&times;</button>
       </div>
 
@@ -186,19 +149,18 @@
           
           <div class="form-group">
             <label class="form-label" for="taskTitle">Título do Trabalho <span class="required">*</span></label>
-            <input type="text" id="taskTitle" class="form-input" placeholder="Ex: Artigo de Conclusão de Curso - TCC" required autofocus>
+            <input type="text" id="taskTitle" class="form-input" placeholder="Ex: Artigo de Metodologia Científica" required autofocus>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="taskLink">Link de Acesso (URL) <span class="required">*</span></label>
-            <input type="url" id="taskLink" class="form-input" placeholder="https://docs.google.com/document/d/..." required>
-            <span class="form-hint">Google Docs, Google Drive, Figma, GitHub, Notion, Trello, etc.</span>
+            <input type="url" id="taskLink" class="form-input" placeholder="https://docs.google.com/..." required>
+            <span class="form-hint">Google Docs, Google Drive, Figma, GitHub, etc.</span>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="taskAssignee">Responsável <span class="required">*</span></label>
-            <input type="text" id="taskAssignee" class="form-input" placeholder="Ex: Lara Beatriz Sousa" required>
-            <span class="form-hint">Nome do integrante responsável pela entrega</span>
+            <input type="text" id="taskAssignee" class="form-input" placeholder="Ex: Lara Beatriz" required>
           </div>
 
           <div class="form-group">
@@ -210,106 +172,38 @@
               <button type="button" class="date-shortcut-chip" data-days="1">Amanhã</button>
               <button type="button" class="date-shortcut-chip" data-days="2">Em 2 dias</button>
               <button type="button" class="date-shortcut-chip" data-days="7">Em 1 semana</button>
-              <button type="button" class="date-shortcut-chip" data-days="14">Em 2 semanas</button>
             </div>
-            <span class="form-hint">O status (Pendente, Urgente ou Atrasado) é calculado automaticamente pela data.</span>
           </div>
 
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="addModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Trabalho</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-close-modal="addModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal 2: Sincronização em Nuvem (GitHub Pages Ready) -->
-  <div class="modal-backdrop" id="syncModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
-      <div class="modal-header">
-        <h3 class="modal-title" id="syncModalTitle">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-          </svg>
-          Sincronização Compartilhada
-        </h3>
-        <button class="modal-close-btn" data-close-modal="syncModal" aria-label="Fechar">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <p style="font-size: 0.8125rem; color: var(--text-muted);">
-          Como o app é hospedado de forma estática no <strong>GitHub Pages</strong>, ele utiliza uma base em nuvem gratuita para que todos os membros do grupo vejam e atualizem as mesmas entregas em tempo real.
-        </p>
-
-        <div class="sync-tab-box">
-          <h4>Configuração Gratuita com Firebase Realtime Database</h4>
-          <ol class="sync-steps-list">
-            <li>Acesse o <a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: var(--brand-crimson); text-decoration: underline;">Firebase Console</a> e crie um projeto gratuito.</li>
-            <li>No menu lateral, vá em <strong>Build &rarr; Realtime Database</strong> e clique em <em>Criar Banco de Dados</em>.</li>
-            <li>Inicie em modo de teste (leitura e escrita públicas).</li>
-            <li>Copie a URL gerada (terminada em <code>.firebaseio.com</code>) e cole abaixo:</li>
-          </ol>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="firebaseUrlInput">URL do Firebase Realtime Database</label>
-          <input type="url" id="firebaseUrlInput" class="form-input" placeholder="https://meu-grupo-default-rtdb.firebaseio.com">
-          <span class="form-hint">Exemplo: <code>https://nome-do-grupo-default-rtdb.firebaseio.com</code></span>
-        </div>
-
-        <div class="form-group" style="padding-top: 0.5rem; border-top: 1px dashed var(--border-color);">
-          <label class="form-label">Link de Acesso Direto para o Grupo</label>
-          <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">
-            Após salvar a URL, envie este link para a equipe no WhatsApp/Teams. Quem abrir já entra sincronizado automaticamente:
-          </p>
-          <div class="sync-url-preview" id="shareUrlPreview">Configure a URL acima para gerar o link da equipe.</div>
-          <button type="button" class="btn btn-secondary" id="copyShareLinkBtn" style="margin-top: 0.5rem; width: 100%;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            Copiar Link da Equipe
-          </button>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="resetToLocalBtn">Usar Apenas Local</button>
-        <button type="button" class="btn btn-primary" id="saveSyncConfigBtn">Salvar e Conectar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 3: Exclusão com Confirmação -->
+  <!-- Modal: Confirmação de Exclusão -->
   <div class="modal-backdrop" id="deleteModal">
-    <div class="modal" role="dialog" aria-modal="true" style="max-width: 420px;">
+    <div class="modal" role="dialog" aria-modal="true" style="max-width: 400px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: var(--status-atrasado-text);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          Excluir Trabalho
-        </h3>
+        <h3 class="modal-title" style="color: var(--status-atrasado-text);">Excluir Trabalho</h3>
         <button class="modal-close-btn" data-close-modal="deleteModal">&times;</button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 0.875rem; color: var(--text-main);">Tem certeza de que deseja excluir o trabalho <strong id="deleteItemTitle"></strong>?</p>
-        <p style="font-size: 0.75rem; color: var(--text-muted);">Esta ação removerá a entrega do painel compartilhado.</p>
+        <p style="font-size: 0.875rem; color: var(--text-primary);">Tem certeza de que deseja excluir <strong id="deleteItemTitle"></strong>?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close-modal="deleteModal">Cancelar</button>
-        <button type="button" class="btn btn-primary" id="confirmDeleteBtn" style="background: var(--status-atrasado-text); border-color: var(--status-atrasado-text);">Excluir</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-close-modal="deleteModal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-sm" id="confirmDeleteBtn" style="background-color: var(--status-atrasado-text);">Excluir</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts Modulares (Carregamento ordenado sem necessidade de bundler) -->
   <script src="./js/date-utils.js"></script>
   <script src="./js/sync.js"></script>
   <script src="./js/ui.js"></script>

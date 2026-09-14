@@ -1,75 +1,56 @@
 # 📋 Painel de Entregas - UniBalsas
 
-Aplicação web desenvolvida com a **identidade visual UniBalsas** para grupos de trabalho gerenciarem links e prazos de entregas em tempo real, evitando links perdidos e datas esquecidas.
+Aplicação web para acompanhamento de prazos e links de trabalhos acadêmicos da **UniBalsas Centro Universitário**.
 
-Hospedagem nativa no **GitHub Pages**: https://carlosoliveira7.github.io/agenda/
-
----
-
-## 🎨 Identidade Visual (UniBalsas)
-
-- **Cores Institucionais**:
-  - Vermelho Carmim (`#b31329`) e Vinho Profundo (`#6b0c1a`) em gradiente.
-  - Branco puro (`#ffffff`) e cinza suave (`#faf7f7`).
-- **Cores Funcionais de Status**:
-  - **Pendente** (prazo > 2 dias): Neutro (cinza/ardósia `#475569`).
-  - **Urgente** (prazo de 0 a 2 dias): Âmbar (`#b45309`).
-  - **Atrasado** (data passada): Vermelho Carmim (`#b91c1c`).
-  - **Concluído** (marcado manualmente): Verde-azulado (*teal* `#0f766e`).
+Acesso via GitHub Pages: **https://carlosoliveira7.github.io/agenda/**
 
 ---
 
-## 📁 Estrutura de Arquivos (Separação de Responsabilidades)
+## ⚡ Conexão Firebase em Tempo Real
 
-O projeto foi estruturado de forma modular e desacoplada, sem necessidade de ferramentas de compilação ou Node.js para rodar:
+O aplicativo já está configurado nativamente para sincronizar com a instância:
+- **Instância**: `agendaub-6d420-default-rtdb`
+- **URL**: `https://agendaub-6d420-default-rtdb.firebaseio.com`
+
+### ⚠️ Regras de Segurança no Firebase Console
+Para que todos os colegas do grupo possam ler e cadastrar entregas, configure as regras no [Firebase Console](https://console.firebase.google.com/):
+
+```json
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+```
+
+---
+
+## 📁 Estrutura do Projeto
 
 ```
 agenda/
-├── index.html              # Estrutura semântica da página e modais
+├── index.html              # Interface semântica da aplicação
 ├── assets/
 │   └── favicon.svg         # Ícone institucional
 ├── css/
-│   ├── variables.css       # Design tokens (cores UniBalsas, status, sombras)
-│   ├── layout.css          # Estrutura responsiva, container, cabeçalho e rodapé
-│   ├── components.css      # Cartões, botões, modais, formulários e badges
-│   └── style.css           # Arquivo mestre de estilos (@import)
+│   ├── variables.css       # Cores institucionais e status funcionais
+│   ├── layout.css          # Grid e estrutura de tela
+│   ├── components.css      # Cartões, botões e modais
+│   └── style.css           # Estilos consolidados
 ├── js/
-│   ├── date-utils.js       # Regras de cálculo de status por data e ordenação
-│   ├── sync.js             # Sincronização em nuvem (Firebase RTDB), SSE e BroadcastChannel
-│   ├── ui.js               # Renderização de componentes e manipulação do DOM
-│   └── app.js              # Controlador principal e registro de eventos
-├── .gitignore              # Arquivos ignorados pelo Git
-└── README.md               # Documentação do projeto
+│   ├── date-utils.js       # Cálculo automático de status por prazo
+│   ├── sync.js             # Conexão direta com Firebase RTDB e SSE
+│   ├── ui.js               # Renderização de tela e feedback
+│   └── app.js              # Controlador principal da aplicação
+└── README.md
 ```
 
 ---
 
-## 🌐 Publicação no GitHub Pages
+## 🎨 Cores e Regras de Status
 
-Como todos os caminhos são relativos (`./css/...`, `./js/...`), a publicação é imediata:
-
-1. Acesse o repositório no GitHub: `https://github.com/CarlosOliveira7/agenda`
-2. Vá em **Settings** &rarr; **Pages** (menu lateral).
-3. Na seção **Build and deployment** &rarr; **Branch**, selecione `main` e a pasta `/ (root)`, e clique em **Save**.
-4. O painel estará disponível em:
-   `https://carlosoliveira7.github.io/agenda/`
-
----
-
-## 🔄 Como Conectar e Compartilhar com o Grupo
-
-1. No painel, clique no botão **Modo Local** (no cabeçalho) ou em **Conectar Nuvem** (no banner).
-2. Cole a URL de um banco de dados gratuito do [Firebase Realtime Database](https://console.firebase.google.com/) (ex: `https://meu-projeto-default-rtdb.firebaseio.com`).
-3. Clique em **Salvar e Conectar**.
-4. Clique em **Copiar Link da Equipe** e envie o link para os colegas de grupo. Qualquer integrante que abrir o link verá e atualizará as mesmas entregas em tempo real!
-
----
-
-## 💻 Testando Localmente
-
-Para rodar no seu computador:
-- Basta abrir o arquivo `index.html` em qualquer navegador.
-- Ou rodar com um servidor HTTP simples:
-  ```bash
-  python3 -m http.server 8000
-  ```
+- **Pendente** (> 2 dias): Neutro (cinza/ardósia)
+- **Urgente** (0 a 2 dias): Âmbar
+- **Atrasado** (< 0 dias): Vermelho Carmim
+- **Concluído**: Verde-azulado (*teal*)
