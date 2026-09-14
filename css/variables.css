@@ -1,0 +1,69 @@
+/* ==========================================================================
+   DESIGN SYSTEM & VARIÁVEIS CSS - TEMA UNIBALSAS
+   Paleta institucional: Vinho, Carmim, Branco e tons de status funcionais
+   ========================================================================== */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Identidade UniBalsas (Vinho e Carmim) */
+  --brand-wine: #6b0c1a;
+  --brand-wine-dark: #4d0712;
+  --brand-crimson: #b31329;
+  --brand-scarlet: #c4122f;
+  --brand-gradient: linear-gradient(135deg, #c4122f 0%, #6b0c1a 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #d31a38 0%, #7d1020 100%);
+
+  /* Neutros e Superfícies */
+  --bg-body: #faf7f7;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f4efef;
+  --border-color: #e8dede;
+  --border-subtle: #f0e6e6;
+  --text-main: #1e1e24;
+  --text-muted: #5e6472;
+  --text-light: #8d95a5;
+
+  /* Cores Primárias de Ação */
+  --primary: var(--brand-crimson);
+  --primary-hover: var(--brand-wine);
+  --primary-subtle: #fff1f2;
+  --primary-border: #fecdd3;
+  --primary-focus: rgba(179, 19, 41, 0.25);
+
+  /* Status Funcionais Obrigatórios */
+  /* 1. Pendente (> 2 dias): Neutro */
+  --status-pendente-bg: #f1f5f9;
+  --status-pendente-border: #cbd5e1;
+  --status-pendente-text: #475569;
+  --status-pendente-dot: #64748b;
+
+  /* 2. Urgente (0 a 2 dias): Âmbar */
+  --status-urgente-bg: #fffbeb;
+  --status-urgente-border: #fde68a;
+  --status-urgente-text: #b45309;
+  --status-urgente-dot: #f59e0b;
+
+  /* 3. Atrasado (< 0 dias): Vermelho */
+  --status-atrasado-bg: #fef2f2;
+  --status-atrasado-border: #fecaca;
+  --status-atrasado-text: #b91c1c;
+  --status-atrasado-dot: var(--brand-scarlet);
+
+  /* 4. Concluído (manual): Verde-azulado */
+  --status-concluido-bg: #f0fdfa;
+  --status-concluido-border: #99f6e4;
+  --status-concluido-text: #0f766e;
+  --status-concluido-dot: #0d9488;
+
+  /* Sombras & Raios */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(107, 12, 26, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(107, 12, 26, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-modal: 0 20px 25px -5px rgba(15, 23, 42, 0.2), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+
+  --transition: all 0.18s ease-in-out;
+}
