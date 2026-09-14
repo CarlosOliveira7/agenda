@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Entregas - UniBalsas</title>
-  <meta name="description" content="Painel de entregas e prazos de trabalhos acadêmicos da UniBalsas.">
+  <title>Painel de Entregas — UniBalsas</title>
+  <meta name="description" content="Gerencie prazos e links de trabalhos do seu grupo.">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
 
-  <!-- Script inline para aplicar o tema antes do render evitando flash visual -->
+  <!-- Aplica tema salvo antes do primeiro render para evitar flash -->
   <script>
     (function () {
       try {
-        const saved = localStorage.getItem('agendaub_theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved || (prefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
+        var saved = localStorage.getItem('agendaub_theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
       } catch (e) {}
     })();
   </script>
@@ -25,9 +24,7 @@
 </head>
 <body>
 
-  <!-- ==========================================================================
-       CABEÇALHO
-       ========================================================================== -->
+  <!-- CABEÇALHO -->
   <header class="header">
     <div class="container header-content">
       <div class="brand-wrapper">
@@ -39,19 +36,19 @@
       </div>
 
       <div class="header-actions">
-        <!-- Indicador de Status da Nuvem -->
-        <div class="sync-status-indicator" id="syncIndicator" title="Conexão com Firebase">
+        <!-- Status de sincronização -->
+        <div class="sync-status-indicator" id="syncIndicator" title="Conexão com o banco de dados">
           <span class="sync-dot offline" id="syncDot"></span>
           <span id="syncText">Conectando...</span>
         </div>
 
-        <!-- Botão Alternador Dark Mode / Light Mode -->
-        <button class="theme-toggle-btn" id="themeToggleBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
-          <!-- Ícone Lua (Modo Claro) -->
+        <!-- Botão de tema -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Alternar modo claro/escuro" aria-label="Alternar tema">
+          <!-- Lua: exibida no modo claro -->
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <!-- Ícone Sol (Modo Escuro) -->
+          <!-- Sol: exibido no modo escuro -->
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -65,9 +62,9 @@
           </svg>
         </button>
 
-        <!-- Botão Nova Entrega -->
+        <!-- Nova entrega -->
         <button class="btn btn-primary" id="openAddModalBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
@@ -77,38 +74,32 @@
     </div>
   </header>
 
-  <!-- ==========================================================================
-       CONTEÚDO PRINCIPAL
-       ========================================================================== -->
+  <!-- CONTEÚDO PRINCIPAL -->
   <main class="main-section">
     <div class="container">
-      
-      <!-- Barra de Filtros e Busca -->
+
+      <!-- Filtros e busca -->
       <div class="toolbar">
         <div class="filters-group" id="filtersGroup" role="tablist">
           <button class="filter-btn active" data-filter="todos" role="tab" aria-selected="true">
             <span>Todos</span>
             <span class="filter-count" id="count-todos">0</span>
           </button>
-          
           <button class="filter-btn" data-filter="pendente" role="tab" aria-selected="false">
             <span class="status-bullet"></span>
             <span>Pendentes</span>
             <span class="filter-count" id="count-pendente">0</span>
           </button>
-
           <button class="filter-btn" data-filter="urgente" role="tab" aria-selected="false">
             <span class="status-bullet"></span>
             <span>Urgentes</span>
             <span class="filter-count" id="count-urgente">0</span>
           </button>
-
           <button class="filter-btn" data-filter="atrasado" role="tab" aria-selected="false">
             <span class="status-bullet"></span>
             <span>Atrasados</span>
             <span class="filter-count" id="count-atrasado">0</span>
           </button>
-
           <button class="filter-btn" data-filter="concluido" role="tab" aria-selected="false">
             <span class="status-bullet"></span>
             <span>Concluídos</span>
@@ -116,96 +107,79 @@
           </button>
         </div>
 
-        <!-- Campo de Busca -->
         <div class="search-box">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="search-input" id="searchInput" placeholder="Buscar entrega ou responsável... (/ para focar)">
+          <input type="text" class="search-input" id="searchInput" placeholder="Buscar por título ou responsável...">
         </div>
       </div>
 
-      <!-- Grid de Cartões -->
-      <div class="cards-grid" id="cardsGrid">
-        <!-- Inserido dinamicamente via UIEngine -->
-      </div>
+      <!-- Grid de cartões -->
+      <div class="cards-grid" id="cardsGrid"></div>
 
     </div>
   </main>
 
-  <!-- ==========================================================================
-       RODAPÉ
-       ========================================================================== -->
+  <!-- RODAPÉ -->
   <footer class="footer">
     <div class="container footer-content">
-      <div>
-        <strong>Painel de Entregas</strong> &bull; UniBalsas Centro Universitário
-      </div>
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <button class="card-action-btn" id="exportDataBtn" title="Baixar backup em JSON">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <span>Painel de Entregas &bull; UniBalsas</span>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button class="card-action-btn" id="exportDataBtn" title="Baixar backup JSON">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
           Backup
         </button>
-        <button class="card-action-btn" id="importDataBtn" title="Restaurar de arquivo JSON">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="card-action-btn" id="importDataBtn" title="Restaurar de JSON">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
           Restaurar
         </button>
-        <button class="card-action-btn" id="clearDbBtn" title="Limpar todas as entregas cadastradas">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="card-action-btn btn-delete" id="clearDbBtn" title="Apagar todas as entregas">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"></polyline>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
-          Limpar Painel
+          Limpar
         </button>
-        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        <input type="file" id="importFileInput" accept=".json" style="display:none;">
       </div>
     </div>
   </footer>
 
-  <!-- ==========================================================================
-       MODAIS
-       ========================================================================== -->
-
-  <!-- Modal: Nova Entrega -->
+  <!-- MODAL: Nova Entrega -->
   <div class="modal-backdrop" id="addModal">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
       <div class="modal-header">
         <h3 class="modal-title" id="addModalTitle">Nova Entrega</h3>
         <button class="modal-close-btn" data-close-modal="addModal" aria-label="Fechar">&times;</button>
       </div>
-
       <form id="addForm">
         <div class="modal-body">
-          
           <div class="form-group">
-            <label class="form-label" for="taskTitle">Título do Trabalho <span class="required">*</span></label>
+            <label class="form-label" for="taskTitle">Título <span class="required">*</span></label>
             <input type="text" id="taskTitle" class="form-input" placeholder="Ex: Artigo de Metodologia Científica" required autofocus>
           </div>
-
           <div class="form-group">
-            <label class="form-label" for="taskLink">Link de Acesso (URL) <span class="required">*</span></label>
+            <label class="form-label" for="taskLink">Link <span class="required">*</span></label>
             <input type="url" id="taskLink" class="form-input" placeholder="https://docs.google.com/..." required>
-            <span class="form-hint">Google Docs, Google Drive, Figma, GitHub, etc.</span>
+            <span class="form-hint">Google Docs, Drive, Figma, GitHub…</span>
           </div>
-
           <div class="form-group">
             <label class="form-label" for="taskAssignee">Responsável <span class="required">*</span></label>
-            <input type="text" id="taskAssignee" class="form-input" placeholder="Ex: Lara Beatriz" required>
+            <input type="text" id="taskAssignee" class="form-input" placeholder="Nome do responsável" required>
           </div>
-
           <div class="form-group">
-            <label class="form-label" for="taskDueDate">Data de Prazo <span class="required">*</span></label>
+            <label class="form-label" for="taskDueDate">Prazo <span class="required">*</span></label>
             <input type="date" id="taskDueDate" class="form-input" required>
-            
             <div class="date-shortcuts">
               <button type="button" class="date-shortcut-chip" data-days="0">Hoje</button>
               <button type="button" class="date-shortcut-chip" data-days="1">Amanhã</button>
@@ -213,30 +187,32 @@
               <button type="button" class="date-shortcut-chip" data-days="7">Em 1 semana</button>
             </div>
           </div>
-
         </div>
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" data-close-modal="addModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary btn-sm">Salvar Entrega</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Confirmação de Exclusão -->
+  <!-- MODAL: Confirmação de Exclusão -->
   <div class="modal-backdrop" id="deleteModal">
-    <div class="modal" role="dialog" aria-modal="true" style="max-width: 400px;">
+    <div class="modal" role="dialog" aria-modal="true" style="max-width:400px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: var(--status-atrasado-text);">Excluir Trabalho</h3>
+        <h3 class="modal-title" style="color:var(--status-atrasado-text);">Excluir Entrega</h3>
         <button class="modal-close-btn" data-close-modal="deleteModal">&times;</button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 0.875rem; color: var(--text-primary);">Tem certeza de que deseja excluir <strong id="deleteItemTitle"></strong>?</p>
+        <p style="font-size:0.875rem;color:var(--text-secondary);">
+          Deseja excluir <strong id="deleteItemTitle" style="color:var(--text-primary);"></strong>?
+          Essa ação não pode ser desfeita.
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-close-modal="deleteModal">Cancelar</button>
-        <button type="button" class="btn btn-primary btn-sm" id="confirmDeleteBtn" style="background-color: var(--status-atrasado-text);">Excluir</button>
+        <button type="button" class="btn btn-primary btn-sm" id="confirmDeleteBtn"
+                style="background-color:var(--status-atrasado-dot);">Excluir</button>
       </div>
     </div>
   </div>

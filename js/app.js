@@ -44,14 +44,15 @@
   }
 
   function setupEventListeners() {
-    // 1. Alternador de Modo Claro / Modo Escuro (Dark Mode)
+    // 1. Alternador de Tema (Dark / Light)
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
-      themeToggleBtn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
+      themeToggleBtn.addEventListener('click', function () {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const next = isDark ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('agendaub_theme', next);
+        try { localStorage.setItem('agendaub_theme', next); } catch (e) {}
+        this.setAttribute('aria-label', next === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro');
         window.UIEngine.showToast(next === 'dark' ? 'Modo escuro ativado' : 'Modo claro ativado');
       });
     }
